@@ -1,0 +1,110 @@
+<html>
+
+<head>
+    <title>News-search</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn|Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Francois+One" rel="stylesheet">
+
+    <link href="main.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>News</h1>
+        <div class="frame">
+
+            <div ng-app ng-init="checked = false">
+                <form class="form-signin" action="." method="post" name="form">
+                    <input id='keyword' class="form-styling" type="text" name="text" placeholder="Enter Keyword" />
+
+                    <input id='search' class='btn-signin' type='button' value='Search' onClick="display()" />
+                    <div id="myModal" class="modal">
+
+                        <!-- Modal content -->
+                        <span class="close">&times;</span>
+
+                        <div class="modal-content" id='content'>
+
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+</body>
+<!--       <script type="text/javascript" src="js/materialize.min.js"></script>
+ -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/superagent/1.2.0/superagent.min.js"></script>
+
+<script type="text/javascript">
+    function display() {
+        var request = new superagent();
+
+        var keywords = document.getElementById("keyword").value;
+        console.log(keywords);
+        superagent.post("http://localhost:5000/news")
+            .send({
+                text: keywords
+            })
+            .end(function(err, res) {
+                // Get only the news title from json
+                var result = [];
+                var result = JSON.parse(res.text)
+                console.log(result)
+                var modal = document.getElementById('myModal');
+                var modal_content = document.getElementById('content')
+                // funcrion to add each news title into an ordered list
+
+                function add_news(array) {
+                    var list = document.createElement('ol');
+                    for (var i = 0; i < array.length; i++) {
+                        var item = document.createElement('li');
+                        var stop = document.createElement('br');
+                        item.appendChild(document.createTextNode(array[i]));
+                        list.appendChild(item);
+                        list.appendChild(stop);
+                    }
+                    return list;
+                }
+
+                modal_content.appendChild(add_news(result));
+
+                // Get the button that opens the modal
+                modal.style.display = "block";
+                // Get the <span> element that closes the modal
+                var span = document.getElementsByClassName("close")[0];
+
+
+
+                // When the user clicks on <span> (x), close the modal
+                span.onclick = function() {
+                    $("#content").empty();
+
+                    modal.style.display = "none";
+
+                }
+
+                // When the user clicks anywhere outside of the modal, close it
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        $("#content").empty();
+
+                        modal.style.display = "none";
+
+                    }
+                }
+
+            })
+    }
+
+</script>
+
+</html>
